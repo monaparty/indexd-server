@@ -8,6 +8,12 @@ let REGTEST = (process.env.REGTEST === '1' || (process.env.REGTEST && process.en
 if (TESTNET && REGTEST) {
   throw new Error('Cannot specify REGTEST and TESTNET at the same time')
 }
+let TESTNET = (process.env.TESTNET === '1' || process.env.TESTNET.toLowerCase() === 'true')
+
+let COIN = (process.env.COIN)
+if (require('coininfo')[COIN] === undefined) {
+  throw new Error(`Cannot find coin information for ${COIN}`);
+}
 
 let debug = require('debug')('index')
 let express = require('express')
@@ -26,6 +32,10 @@ if (process.env.CORS === '*') {
 
 // run the service
 debug(`Initializing blockchain connection${["", " (for testnet)", " (for regtest)"][(TESTNET?1:0)+(REGTEST?2:0)]}`)
+if (COIN) {
+  debug(`Coin: ${COIN}`)
+}
+
 service((err, adapter) => {
   if (err) {
     return debug('Initialization failed:', err)
@@ -33,7 +43,7 @@ service((err, adapter) => {
 
   // start the API server
   debug('starting API server')
-  app.use(api(adapter, {testnet: TESTNET, regtest: REGTEST, custom: process.env.CUSTOM}))
+  app.use(api(adapter, {coin: process.env.COIN, testnet: TESTNET, regtest: REGTEST, custom: process.env.CUSTOM}))
   app.listen(process.env.SERVER_PORT);
   debug("App listening on port "+process.env.SERVER_PORT);
 })
