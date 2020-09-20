@@ -8,7 +8,6 @@ let REGTEST = (process.env.REGTEST === '1' || (process.env.REGTEST && process.en
 if (TESTNET && REGTEST) {
   throw new Error('Cannot specify REGTEST and TESTNET at the same time')
 }
-let TESTNET = (process.env.TESTNET === '1' || process.env.TESTNET.toLowerCase() === 'true')
 
 let COIN = (process.env.COIN)
 if (require('coininfo')[COIN] === undefined) {
